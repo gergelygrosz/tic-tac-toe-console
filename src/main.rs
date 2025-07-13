@@ -1,12 +1,30 @@
+use std::fmt::{self, Display, Result};
 use std::io::{self, Write, stdout};
 
-use grid::Player;
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub enum Player {
+    None = 0,
+    O = 1,
+    X = 2,
+}
 
-mod grid;
+impl Display for Player {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                Player::None => String::from(" "),
+                Player::O => String::from("O"),
+                Player::X => String::from("X"),
+            }
+        )
+    }
+}
 
 fn main() {
     let mut state: [[Player; 3]; 3] = [[Player::None; 3]; 3];
-    grid::print_grid(&state);
+    print_grid(&state);
 
     let mut current_player = Player::O;
     loop {
@@ -23,6 +41,25 @@ fn main() {
     }
 }
 
+pub fn print_grid(grid: &[[Player; 3]; 3]) {
+    for (row_idx, row) in grid.iter().enumerate() {
+        for (slot_idx, slot) in row.iter().enumerate() {
+            print!("{slot}");
+            if slot_idx != 2 {
+                // U+2502 "Box Drawings Light Vertical"
+                print!("│");
+            }
+        }
+
+        println!();
+        if row_idx != 2 {
+            // U+2500 "Box Drawings Light Horizontal" and
+            // U+253C "Box Drawings Light Vertical and Horizontal"
+            println!("─┼─┼─");
+        }
+    }
+}
+
 /// Displays the game state.
 /// Takes and processes user input.
 /// Returns `true` if the game is won.
@@ -35,7 +72,7 @@ fn game_turn(state: &mut [[Player; 3]; 3], current_player: Player) -> bool {
     let col: usize = take_position_input("input: position: col: ");
 
     state[row - 1][col - 1] = current_player;
-    grid::print_grid(&state);
+    print_grid(&state);
 
     if is_victory(&state, Player::O) {
         println!("PLAYER {} won! Congratulations!", Player::O);
