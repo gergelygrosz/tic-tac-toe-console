@@ -138,6 +138,11 @@ fn take_pos_inputs(state: &GameState) -> (usize, usize) {
         let col = col.unwrap() - 1;
         let row = row.unwrap() - 1;
 
+        if col > 2 || row > 2 {
+            println!("Too big. Try again.");
+            continue;
+        }
+
         if state[row][col] != Player::None {
             println!("Slot already occupied. Try again.");
             continue;
