@@ -1,7 +1,8 @@
+use std::collections::HashSet;
 use std::fmt::{self, Display, Result};
 use std::io::{Write, stdin, stdout};
 
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Player {
     None = 0,
     O = 1,
@@ -48,35 +49,24 @@ fn main() {
 /// Takes and processes user input.
 /// Returns `true` if the game is won.
 fn game_turn(state: &mut GameState, current_player: Player) -> bool {
-    clear_the_screen();
     print_grid(&state);
     println!("PLAYER {}'s turn!", current_player);
 
     let pos: (usize, usize) = take_pos_inputs(&state);
     state[pos.0][pos.1] = current_player;
 
-    if is_victory(&state, Player::O) {
-        clear_the_screen();
+    let winner = check_victory(state);
+    if winner != Player::None {
         print_grid(&state);
-        println!("PLAYER {} won! Congratulations!", Player::O);
-        return true;
-    };
-
-    if is_victory(&state, Player::X) {
-        clear_the_screen();
-        print_grid(&state);
-        println!("PLAYER {} won! Congratulations!", Player::X);
+        println!("PLAYER {} won! Congratulations!", winner);
         return true;
     }
 
     false
 }
 
-fn clear_the_screen() {
-    print!("\x1Bc");
-}
-
 pub fn print_grid(grid: &GameState) {
+    clear_the_screen();
     println!("   1 2 3");
     // U+256D "Box Drawings Light Arc Down and Right" and
     // U+2500 "Box Drawings Light Horizontal" and
@@ -108,6 +98,10 @@ pub fn print_grid(grid: &GameState) {
     // U+252C "Box Drawings Light Down and Horizontal" and
     // U+256F "Box Drawings Light Arc Up and Left"
     println!("  ╰─┴─┴─╯");
+}
+
+fn clear_the_screen() {
+    print!("\x1Bc");
 }
 
 fn take_pos_inputs(state: &GameState) -> (usize, usize) {
@@ -152,32 +146,47 @@ fn take_pos_inputs(state: &GameState) -> (usize, usize) {
     }
 }
 
-/// Returns `true` if the given player won the game. Otherwise, returns `false``.
-fn is_victory(state: &GameState, player: Player) -> bool {
+fn check_victory(state: &GameState) -> Player {
     // horizontal checks
     for row in state {
-        if row[0] == player && row[1] == player && row[2] == player {
-            return true;
+        let mut horizontal_set = HashSet::new();
+        horizontal_set.insert(row[0]);
+        horizontal_set.insert(row[1]);
+        horizontal_set.insert(row[2]);
+        if horizontal_set.len() == 1 && !horizontal_set.contains(&Player::None) {
+            return *horizontal_set.iter().next().unwrap();
         }
     }
 
     // vertical checks
     for col in 0..3 {
-        if state[0][col] == player && state[1][col] == player && state[2][col] == player {
-            return true;
+        let mut vertical_set = HashSet::new();
+        vertical_set.insert(state[0][col]);
+        vertical_set.insert(state[1][col]);
+        vertical_set.insert(state[2][col]);
+        if vertical_set.len() == 1 && !vertical_set.contains(&Player::None) {
+            return *vertical_set.iter().next().unwrap();
         }
     }
 
     // diagonal checks
     // upper-left -> bottom-right
-    if state[0][0] == player && state[1][1] == player && state[2][2] == player {
-        return true;
+    let mut diagonal_set1 = HashSet::new();
+    diagonal_set1.insert(state[0][0]);
+    diagonal_set1.insert(state[1][1]);
+    diagonal_set1.insert(state[2][2]);
+    if diagonal_set1.len() == 1 && !diagonal_set1.contains(&Player::None) {
+        return *diagonal_set1.iter().next().unwrap();
     }
 
     // upper-right -> bottom-left
-    if state[0][2] == player && state[1][1] == player && state[2][0] == player {
-        return true;
+    let mut diagonal_set2 = HashSet::new();
+    diagonal_set2.insert(state[0][2]);
+    diagonal_set2.insert(state[1][1]);
+    diagonal_set2.insert(state[2][0]);
+    if diagonal_set2.len() == 1 && !diagonal_set2.contains(&Player::None) {
+        return *diagonal_set2.iter().next().unwrap();
     }
 
-    false
+    Player::None
 }
