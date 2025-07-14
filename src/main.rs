@@ -1,5 +1,5 @@
 use std::fmt::{self, Display, Result};
-use std::io::{self, Write, stdout};
+use std::io::{Write, stdin, stdout};
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Player {
@@ -107,51 +107,40 @@ pub fn print_grid(grid: &[[Player; 3]; 3]) {
     println!("  ╰─┴─┴─╯");
 }
 
-/// Returns the INDEX!!!
 fn take_pos_inputs(state: &[[Player; 3]; 3]) -> (usize, usize) {
     loop {
-        let row = take_one_input("enter the row:") - 1;
-        let col = take_one_input("enter the column:") - 1;
-
-        if state[row][col] == Player::None {
-            return (row, col);
-        }
-
-        println!("already occupied. try again.")
-    }
-}
-
-fn take_one_input(prompt: &str) -> usize {
-    loop {
-        print!("{}", prompt);
+        print!("enter your move as {{row}},{{col}} (e.g. 1,2): ");
         let _ = stdout().flush();
 
-        let mut input: String = String::new();
-        let res = io::stdin().read_line(&mut input);
-        if res.is_err() {
-            println!("error while reading console. try again.");
+        let mut input_str: String = String::new();
+        let _ = stdin().read_line(&mut input_str);
+
+        let mut split = input_str.split(',');
+
+        let row = split.next();
+        let col = split.next();
+        if row.is_none() || col.is_none() {
+            println!("not enough inputs. try again.");
             continue;
         }
 
-        input = input.trim().to_string();
+        let row = row.unwrap().trim().parse::<usize>();
+        let col = col.unwrap().trim().parse::<usize>();
 
-        let res = input.parse::<usize>();
-        if res.is_err() {
+        if row.is_err() || col.is_err() {
             println!("invalid input. try again.");
             continue;
         }
 
-        let res = res.unwrap();
-        if res < 1 {
-            println!("too small. try again.");
-            continue;
-        }
-        if res > 3 {
-            println!("too big. try again.");
+        let row = row.unwrap() - 1;
+        let col = col.unwrap() - 1;
+
+        if state[row][col] != Player::None {
+            println!("slot already occupied. try again.");
             continue;
         }
 
-        return res;
+        return (row, col);
     }
 }
 
