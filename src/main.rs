@@ -42,7 +42,15 @@ fn main() {
 }
 
 pub fn print_grid(grid: &[[Player; 3]; 3]) {
+    println!("   1 2 3");
+    // U+256D "Box Drawings Light Arc Down and Right" and
+    // U+2500 "Box Drawings Light Horizontal" and
+    // U+252C "Box Drawings Light Down and Horizontal" and
+    // U+256E "Box Drawings Light Arc Down and Left"
+    println!("  ╭─┬─┬─╮");
     for (row_idx, row) in grid.iter().enumerate() {
+        // U+2502 "Box Drawings Light Vertical"
+        print!("{} │", row_idx + 1);
         for (slot_idx, slot) in row.iter().enumerate() {
             print!("{slot}");
             if slot_idx != 2 {
@@ -50,14 +58,21 @@ pub fn print_grid(grid: &[[Player; 3]; 3]) {
                 print!("│");
             }
         }
+        // U+2502 "Box Drawings Light Vertical"
+        print!("│");
 
         println!();
         if row_idx != 2 {
             // U+2500 "Box Drawings Light Horizontal" and
             // U+253C "Box Drawings Light Vertical and Horizontal"
-            println!("─┼─┼─");
+            println!("  ├─┼─┼─┤");
         }
     }
+    // U+2570 "Box Drawings Light Arc Up and Right" and
+    // U+2500 "Box Drawings Light Horizontal" and
+    // U+252C "Box Drawings Light Down and Horizontal" and
+    // U+256F "Box Drawings Light Arc Up and Left"
+    println!("  ╰─┴─┴─╯");
 }
 
 /// Displays the game state.
