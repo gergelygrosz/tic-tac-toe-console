@@ -64,7 +64,8 @@ pub fn print_grid(grid: &[[Player; 3]; 3]) {
 /// Takes and processes user input.
 /// Returns `true` if the game is won.
 fn game_turn(state: &mut [[Player; 3]; 3], current_player: Player) -> bool {
-    // TODO: clear stdout display at the start of every turn
+    clear_the_screen();
+    print_grid(&state);
     println!("PLAYER {}'s turn!", current_player);
 
     // TODO: make it so that players can't choose and overwrite non-empty slots
@@ -72,19 +73,26 @@ fn game_turn(state: &mut [[Player; 3]; 3], current_player: Player) -> bool {
     let col: usize = take_position_input("input: position: col: ");
 
     state[row - 1][col - 1] = current_player;
-    print_grid(&state);
 
     if is_victory(&state, Player::O) {
+        clear_the_screen();
+        print_grid(&state);
         println!("PLAYER {} won! Congratulations!", Player::O);
         return true;
     };
 
     if is_victory(&state, Player::X) {
+        clear_the_screen();
+        print_grid(&state);
         println!("PLAYER {} won! Congratulations!", Player::X);
         return true;
     }
 
     false
+}
+
+fn clear_the_screen() {
+    print!("\x1Bc");
 }
 
 fn take_position_input(prompt: &str) -> usize {
