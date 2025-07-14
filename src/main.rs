@@ -34,6 +34,12 @@ fn main() {
             Player::None => panic!(),
         }
     }
+
+    print!("Press ENTER to exit...");
+    let _ = stdout().flush();
+
+    let mut wait = String::new();
+    let _ = stdin().read_line(&mut wait);
 }
 
 /// Displays the game state.
