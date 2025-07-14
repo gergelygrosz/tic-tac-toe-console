@@ -109,7 +109,7 @@ pub fn print_grid(grid: &[[Player; 3]; 3]) {
 
 fn take_pos_inputs(state: &[[Player; 3]; 3]) -> (usize, usize) {
     loop {
-        print!("enter your move as {{row}},{{col}} (e.g. 1,2): ");
+        print!("enter your move as {{col}},{{row}} (e.g. 1,2): ");
         let _ = stdout().flush();
 
         let mut input_str: String = String::new();
@@ -117,23 +117,23 @@ fn take_pos_inputs(state: &[[Player; 3]; 3]) -> (usize, usize) {
 
         let mut split = input_str.split(',');
 
-        let row = split.next();
         let col = split.next();
+        let row = split.next();
         if row.is_none() || col.is_none() {
-            println!("not enough inputs. try again.");
-            continue;
-        }
-
-        let row = row.unwrap().trim().parse::<usize>();
-        let col = col.unwrap().trim().parse::<usize>();
-
-        if row.is_err() || col.is_err() {
             println!("invalid input. try again.");
             continue;
         }
 
-        let row = row.unwrap() - 1;
+        let col = col.unwrap().trim().parse::<usize>();
+        let row = row.unwrap().trim().parse::<usize>();
+
+        if col.is_err() || row.is_err() {
+            println!("invalid input. try again.");
+            continue;
+        }
+
         let col = col.unwrap() - 1;
+        let row = row.unwrap() - 1;
 
         if state[row][col] != Player::None {
             println!("slot already occupied. try again.");
