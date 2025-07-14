@@ -27,12 +27,7 @@ fn main() {
     print_grid(&state);
 
     let mut current_player = Player::O;
-    loop {
-        let end = game_turn(&mut state, current_player);
-        if end {
-            break;
-        }
-
+    while !game_turn(&mut state, current_player) {
         current_player = match current_player {
             Player::O => Player::X,
             Player::X => Player::O,
@@ -109,7 +104,7 @@ pub fn print_grid(grid: &[[Player; 3]; 3]) {
 
 fn take_pos_inputs(state: &[[Player; 3]; 3]) -> (usize, usize) {
     loop {
-        print!("enter your move as {{col}},{{row}} (e.g. 1,2): ");
+        print!("Enter your move as {{col}},{{row}} (e.g. 1,2): ");
         let _ = stdout().flush();
 
         let mut input_str: String = String::new();
@@ -120,7 +115,7 @@ fn take_pos_inputs(state: &[[Player; 3]; 3]) -> (usize, usize) {
         let col = split.next();
         let row = split.next();
         if row.is_none() || col.is_none() {
-            println!("invalid input. try again.");
+            println!("Invalid input. Try again.");
             continue;
         }
 
@@ -128,7 +123,7 @@ fn take_pos_inputs(state: &[[Player; 3]; 3]) -> (usize, usize) {
         let row = row.unwrap().trim().parse::<usize>();
 
         if col.is_err() || row.is_err() {
-            println!("invalid input. try again.");
+            println!("Invalid input. Try again.");
             continue;
         }
 
@@ -136,7 +131,7 @@ fn take_pos_inputs(state: &[[Player; 3]; 3]) -> (usize, usize) {
         let row = row.unwrap() - 1;
 
         if state[row][col] != Player::None {
-            println!("slot already occupied. try again.");
+            println!("Slot already occupied. Try again.");
             continue;
         }
 
