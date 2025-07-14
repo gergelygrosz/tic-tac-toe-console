@@ -41,6 +41,38 @@ fn main() {
     }
 }
 
+/// Displays the game state.
+/// Takes and processes user input.
+/// Returns `true` if the game is won.
+fn game_turn(state: &mut [[Player; 3]; 3], current_player: Player) -> bool {
+    clear_the_screen();
+    print_grid(&state);
+    println!("PLAYER {}'s turn!", current_player);
+
+    let pos: (usize, usize) = take_pos_inputs(&state);
+    state[pos.0][pos.1] = current_player;
+
+    if is_victory(&state, Player::O) {
+        clear_the_screen();
+        print_grid(&state);
+        println!("PLAYER {} won! Congratulations!", Player::O);
+        return true;
+    };
+
+    if is_victory(&state, Player::X) {
+        clear_the_screen();
+        print_grid(&state);
+        println!("PLAYER {} won! Congratulations!", Player::X);
+        return true;
+    }
+
+    false
+}
+
+fn clear_the_screen() {
+    print!("\x1Bc");
+}
+
 pub fn print_grid(grid: &[[Player; 3]; 3]) {
     println!("   1 2 3");
     // U+256D "Box Drawings Light Arc Down and Right" and
@@ -75,42 +107,21 @@ pub fn print_grid(grid: &[[Player; 3]; 3]) {
     println!("  ╰─┴─┴─╯");
 }
 
-/// Displays the game state.
-/// Takes and processes user input.
-/// Returns `true` if the game is won.
-fn game_turn(state: &mut [[Player; 3]; 3], current_player: Player) -> bool {
-    clear_the_screen();
-    print_grid(&state);
-    println!("PLAYER {}'s turn!", current_player);
+/// Returns the INDEX!!!
+fn take_pos_inputs(state: &[[Player; 3]; 3]) -> (usize, usize) {
+    loop {
+        let row = take_one_input("enter the row:") - 1;
+        let col = take_one_input("enter the column:") - 1;
 
-    // TODO: make it so that players can't choose and overwrite non-empty slots
-    let row: usize = take_position_input("input: position: row: ");
-    let col: usize = take_position_input("input: position: col: ");
+        if state[row][col] == Player::None {
+            return (row, col);
+        }
 
-    state[row - 1][col - 1] = current_player;
-
-    if is_victory(&state, Player::O) {
-        clear_the_screen();
-        print_grid(&state);
-        println!("PLAYER {} won! Congratulations!", Player::O);
-        return true;
-    };
-
-    if is_victory(&state, Player::X) {
-        clear_the_screen();
-        print_grid(&state);
-        println!("PLAYER {} won! Congratulations!", Player::X);
-        return true;
+        println!("already occupied. try again.")
     }
-
-    false
 }
 
-fn clear_the_screen() {
-    print!("\x1Bc");
-}
-
-fn take_position_input(prompt: &str) -> usize {
+fn take_one_input(prompt: &str) -> usize {
     loop {
         print!("{}", prompt);
         let _ = stdout().flush();
@@ -118,7 +129,7 @@ fn take_position_input(prompt: &str) -> usize {
         let mut input: String = String::new();
         let res = io::stdin().read_line(&mut input);
         if res.is_err() {
-            println!("{}", res.unwrap_err()); // TODO: add user-friendly error messages
+            println!("error while reading console. try again.");
             continue;
         }
 
@@ -126,16 +137,17 @@ fn take_position_input(prompt: &str) -> usize {
 
         let res = input.parse::<usize>();
         if res.is_err() {
-            println!("{}", res.unwrap_err()); // TODO: add user-friendly error messages
+            println!("invalid input. try again.");
             continue;
         }
 
         let res = res.unwrap();
-        if res <= 0 {
-            println!("too small")
+        if res < 1 {
+            println!("too small. try again.");
+            continue;
         }
-        if res >= 4 {
-            println!("too big");
+        if res > 3 {
+            println!("too big. try again.");
             continue;
         }
 
