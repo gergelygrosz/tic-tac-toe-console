@@ -22,8 +22,10 @@ impl Display for Player {
     }
 }
 
+type GameState = [[Player; 3]; 3];
+
 fn main() {
-    let mut state: [[Player; 3]; 3] = [[Player::None; 3]; 3];
+    let mut state: GameState = [[Player::None; 3]; 3];
     print_grid(&state);
 
     let mut current_player = Player::O;
@@ -45,7 +47,7 @@ fn main() {
 /// Displays the game state.
 /// Takes and processes user input.
 /// Returns `true` if the game is won.
-fn game_turn(state: &mut [[Player; 3]; 3], current_player: Player) -> bool {
+fn game_turn(state: &mut GameState, current_player: Player) -> bool {
     clear_the_screen();
     print_grid(&state);
     println!("PLAYER {}'s turn!", current_player);
@@ -74,7 +76,7 @@ fn clear_the_screen() {
     print!("\x1Bc");
 }
 
-pub fn print_grid(grid: &[[Player; 3]; 3]) {
+pub fn print_grid(grid: &GameState) {
     println!("   1 2 3");
     // U+256D "Box Drawings Light Arc Down and Right" and
     // U+2500 "Box Drawings Light Horizontal" and
@@ -108,7 +110,7 @@ pub fn print_grid(grid: &[[Player; 3]; 3]) {
     println!("  ╰─┴─┴─╯");
 }
 
-fn take_pos_inputs(state: &[[Player; 3]; 3]) -> (usize, usize) {
+fn take_pos_inputs(state: &GameState) -> (usize, usize) {
     loop {
         print!("Enter your move as {{col}},{{row}} (e.g. 1,2): ");
         let _ = stdout().flush();
@@ -146,7 +148,7 @@ fn take_pos_inputs(state: &[[Player; 3]; 3]) -> (usize, usize) {
 }
 
 /// Returns `true` if the given player won the game. Otherwise, returns `false``.
-fn is_victory(state: &[[Player; 3]; 3], player: Player) -> bool {
+fn is_victory(state: &GameState, player: Player) -> bool {
     // horizontal checks
     for row in state {
         if row[0] == player && row[1] == player && row[2] == player {
