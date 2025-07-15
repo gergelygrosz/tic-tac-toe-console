@@ -62,6 +62,12 @@ fn game_turn(state: &mut GameState, current_player: Player) -> bool {
         return true;
     }
 
+    if is_draw(state) {
+        print_grid(&state);
+        println!("This game is a draw!");
+        return true;
+    }
+
     false
 }
 
@@ -189,4 +195,59 @@ fn check_victory(state: &GameState) -> Player {
     }
 
     Player::None
+}
+
+fn is_draw(state: &GameState) -> bool {
+    let mut unwinnables = 0;
+
+    // horizontal checks
+    for row in state {
+        let mut horizontal_set = HashSet::new();
+        horizontal_set.insert(row[0]);
+        horizontal_set.insert(row[1]);
+        horizontal_set.insert(row[2]);
+        if horizontal_set.len() == 3
+            || (horizontal_set.len() == 2 && !horizontal_set.contains(&Player::None))
+        {
+            unwinnables += 1;
+        }
+    }
+
+    // vertical checks
+    for col in 0..3 {
+        let mut vertical_set = HashSet::new();
+        vertical_set.insert(state[0][col]);
+        vertical_set.insert(state[1][col]);
+        vertical_set.insert(state[2][col]);
+        if vertical_set.len() == 3
+            || (vertical_set.len() == 2 && !vertical_set.contains(&Player::None))
+        {
+            unwinnables += 1;
+        }
+    }
+
+    // diagonal checks
+    // upper-left -> bottom-right
+    let mut diagonal_set1 = HashSet::new();
+    diagonal_set1.insert(state[0][0]);
+    diagonal_set1.insert(state[1][1]);
+    diagonal_set1.insert(state[2][2]);
+    if diagonal_set1.len() == 3
+        || (diagonal_set1.len() == 2 && !diagonal_set1.contains(&Player::None))
+    {
+        unwinnables += 1;
+    }
+
+    // upper-right -> bottom-left
+    let mut diagonal_set2 = HashSet::new();
+    diagonal_set2.insert(state[0][2]);
+    diagonal_set2.insert(state[1][1]);
+    diagonal_set2.insert(state[2][0]);
+    if diagonal_set1.len() == 3
+        || (diagonal_set2.len() == 2 && !diagonal_set2.contains(&Player::None))
+    {
+        unwinnables += 1;
+    }
+
+    unwinnables == 8
 }
