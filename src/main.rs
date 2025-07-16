@@ -49,21 +49,21 @@ fn main() {
 /// Takes and processes user input.
 /// Returns `true` if the game is won.
 fn game_turn(state: &mut GameState, current_player: Player) -> bool {
-    print_grid(&state);
-    println!("PLAYER {}'s turn!", current_player);
+    print_grid(state);
+    println!("PLAYER {current_player}'s turn!");
 
-    let pos: (usize, usize) = take_pos_inputs(&state);
+    let pos: (usize, usize) = take_pos_inputs(state);
     state[pos.0][pos.1] = current_player;
 
     let winner = check_victory(state);
     if winner != Player::None {
-        print_grid(&state);
-        println!("PLAYER {} won! Congratulations!", winner);
+        print_grid(state);
+        println!("PLAYER {winner} won! Congratulations!");
         return true;
     }
 
     if is_draw(state) {
-        print_grid(&state);
+        print_grid(state);
         println!("This game is a draw!");
         return true;
     }
@@ -249,5 +249,6 @@ fn is_draw(state: &GameState) -> bool {
         unwinnables += 1;
     }
 
+    // the total amount of win positions is 8
     unwinnables == 8
 }
